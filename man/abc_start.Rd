@@ -24,8 +24,9 @@ ABC algorithm
 \examples{
 prior <- function(n){data.frame(mean = rnorm(n, 5))}
 distance <- function(x){
-data <- rnorm(1000, x)
-output <- abs(mean(data) - 3)
+  data <- rnorm(1000, x)
+  output <- abs(mean(data) - 3)
+  return(output)
 }
 
 abc_post_1 <- abc_start(prior, distance, method = "rejection", parallel = FALSE, control = list(epsilon = 0.1))
@@ -34,8 +35,9 @@ hist(abc_post_1$mean)
 
 prior <- function(n){data.frame(mean = runif(n, 2, 4), sd = rgamma(n, 1, 1))}
 distance <- function(x){
-    data <- rnorm(1000, x[1], x[2])
-    output <- sqrt( (mean(data) - 3)^2 + (sd(data) - 1)^2)
+  data <- rnorm(1000, x[1], x[2])
+  output <- sqrt( (mean(data) - 3)^2 + (sd(data) - 1)^2)
+  return(output)
 }
 
 abc_post_2 <- abc_start(prior, distance, method = "rejection", parallel = FALSE, control = list(epsilon = 0.1))
