@@ -29,22 +29,42 @@ distance <- function(x){
   return(output)
 }
 
-abc_post_1 <- abc_start(prior, distance, method = "rejection", parallel = FALSE, control = list(epsilon = 0.1))
+abc_post_1 <- abc_start(
+  prior,
+  distance,
+  method = "rejection",
+  parallel = FALSE,
+  control = list(epsilon = 0.1)
+)
 
 hist(abc_post_1$mean)
 
-prior <- function(n){data.frame(mean = runif(n, 2, 4), sd = rgamma(n, 1, 1))}
+prior <- function(n){
+  data.frame(mean = runif(n, 2, 4), sd = rgamma(n, 1, 1))
+}
 distance <- function(x){
   data <- rnorm(1000, x[1], x[2])
   output <- sqrt( (mean(data) - 3)^2 + (sd(data) - 1)^2)
   return(output)
 }
 
-abc_post_2 <- abc_start(prior, distance, method = "rejection", parallel = FALSE, control = list(epsilon = 0.1))
+abc_post_2 <- abc_start(
+  prior,
+  distance,
+  method = "rejection",
+  parallel = FALSE,
+  control = list(epsilon = 0.1)
+)
 
 hist(abc_post_2$mean)
 hist(abc_post_2$mean)
 
-abc_post_2 <- abc_start(prior, distance, method = "RABC", parallel = FALSE, control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))}))
+abc_post_2 <- abc_start(
+  prior,
+  distance,
+  method = "RABC",
+  parallel = FALSE,
+  control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))})
+)
 
 }

@@ -77,13 +77,6 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
 
   lfunc <- make_lfunc(parallel)
 
-
-
-  if(identical(control$cov_func, cov) && dim(param)[2] == 1){
-    print("Changing control$cov_func to var because problem is 1D")
-    control$cov_func <- var
-  }
-
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
 
@@ -130,9 +123,9 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
 
     print("********************************");
 
-    cat("Aceptance prob of MCMC was ",p_acc,"\n");
+    cat("Acceptance prob of MCMC was ",p_acc,"\n");
     cat("Number of MCMC moves for next iteration is ",R,"\n");
-    cat("number of unique particles is ", length(unique(input_params_s[,1])),"\n")
+    cat("Number of unique particles is ", length(unique(input_params_s[,1])),"\n")
 
     # order the particles according to the distance
     input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
