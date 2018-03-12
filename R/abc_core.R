@@ -30,6 +30,8 @@
 #' hist(abc_post_2$mean)
 #' hist(abc_post_2$mean)
 #'
+#' abc_post_2 <- abc_start(prior, distance, method = "RABC", parallel = FALSE, control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))}))
+#'
 #' @export
 abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), parallel = FALSE, cl = NULL){
 

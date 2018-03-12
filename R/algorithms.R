@@ -8,11 +8,13 @@ abc_algorithm <- function(prior, distance, transition, algorithm, control, paral
 
 abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, parallel, cl){
 
+  param <- prior(n)
+
   control <- do.call("abc_control.rejection", control)
   lfunc <- make_lfunc(parallel)
 
   n <- control$n
-  param <- prior(n)
+
 
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
@@ -63,16 +65,24 @@ rejection_core <- function(n, prior, distance, lfunc){
 
 # RABC
 
-abc_control.RABC <- function(n = 1000, a = 0.5, c1 = 0.01, R = 10, eps_final = 0, pacc_final = 0.02, num_drop = n * a, num_keep = n - num_drop, cov_func = cov){
-  list(n = n, a = a, c1 = c1, R = R, eps_final = eps_final, pacc_final = pacc_final, num_drop = num_drop, num_keep = num_keep, cov_func = cov_func)
+abc_control.RABC <- function(n = 1000, a = 0.5, c1 = 0.01, R = 10, eps_final = 0, pacc_final = 0.02, num_drop = n * a, num_keep = n - num_drop, n_param, cov_func = ifelse(n_param == 1, var, cov), prior_eval = function(x,y){return(1)}){
+  list(n = n, a = a, c1 = c1, R = R, eps_final = eps_final, pacc_final = pacc_final, num_drop = num_drop, num_keep = num_keep, n_param = n_param, cov_func = cov_func, prior_eval = prior_eval)
 }
 
 abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, parallel, cl){
 
+  param <- prior(1)
+  control$n_param <- dim(param)[2]
   control <- do.call("abc_control.RABC", control)
+
   lfunc <- make_lfunc(parallel)
 
-  param <- prior(1)
+
+
+  if(identical(control$cov_func, cov) && dim(param)[2] == 1){
+    print("Changing control$cov_func to var because problem is 1D")
+    control$cov_func <- var
+  }
 
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
@@ -85,9 +95,6 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
   dist_max <- input_params_s[control$n, dist_col]
 
   R = control$R
-
-  print(dist_max)
-  print(control$eps_final)
 
   while(dist_max > control$eps_final){
 
@@ -105,7 +112,8 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
       num_keep = control$num_keep,
       R = R,
       rw_cov = rw_cov,
-      distance = distance
+      distance = distance,
+      prior_eval = control$prior_eval
     )
 
     output <- t(output)
@@ -151,30 +159,31 @@ RABC_core <-
            num_keep,
            R,
            rw_cov,
-           distance) {
+           distance,
+           prior_eval) {
     # resample from the particle population
     input_params_s <- as.numeric(input_params_s)
 
     iacc <- 0
-    input_params <- input_params_s[-length(input_params_s)]
-    input_s      <- input_params_s[length(input_params_s)]
+    input_params <- as.numeric(input_params_s[-length(input_params_s)])
+    input_s      <- as.numeric(input_params_s[length(input_params_s)])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
       # repeat
 
-      prop <- MASS::mvrnorm(n = 1, as.matrix(input_params, ncol = 1), rw_cov)
+      prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(input_params, ncol = 1), rw_cov))
 
-      # check if its within the prior distribution
-      if (any(prop < c(-Inf, 0)) || any(prop > c(Inf, Inf))) {
+      #check if its within the prior distribution
+
+      if (prior_eval(prop) == 0) {
         next
-
       }
 
       dist_prop = distance(as.numeric(prop))
 
 
-      if (dist_prop <= dist_next) {
+      if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > runif(1)) {
         # Metropolis-Hastings Ratio
         iacc <- iacc + 1
 
