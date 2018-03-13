@@ -1,16 +1,19 @@
 
 
-abc_algorithm <- function(prior, distance, transition, algorithm, control, parallel, cl){
+abc_algorithm <- function(prior, distance, transition, algorithm, control, output_control, cl){
   UseMethod("abc_algorithm", algorithm)
 }
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, parallel, cl){
-
-  param <- prior(n)
+abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, output_control, cl){
 
   control <- do.call("abc_control.rejection", control)
+  output_control <- do.call("abc_output.rejection", output_control)
+
+  param <- prior(1)
+
+  parallel <- ifelse(length(cl) == 0, FALSE, TRUE)
   lfunc <- make_lfunc(parallel)
 
   n <- control$n
@@ -36,16 +39,16 @@ abc_algorithm.rejection <- function(prior, distance, transition, algorithm, cont
 
   output <- as.data.frame(output)
   output <- output[sample.int(control$n), ]
+  rownames(output) <- seq(length=nrow(output))
+
   names(output) <- c(names(param), "distance")
 
+  if(output_control$include_dist){
+    return(output)
+  } else {
+    return(output[, - dist_col, drop = FALSE])
+  }
 
-  return(output[, - dist_col, drop = FALSE])
-
-}
-
-
-abc_control.rejection <- function(n = 1000, epsilon = 0.05, full_output = FALSE, delta = 1e-3){
-  list(n = n, epsilon = epsilon, full_output = full_output, delta = delta)
 }
 
 rejection_core <- function(n, prior, distance, lfunc){
@@ -65,16 +68,16 @@ rejection_core <- function(n, prior, distance, lfunc){
 
 # RABC
 
-abc_control.RABC <- function(n = 1000, a = 0.5, c1 = 0.01, R = 10, eps_final = 0, pacc_final = 0.02, num_drop = n * a, num_keep = n - num_drop, n_param, cov_func = ifelse(n_param == 1, var, cov), prior_eval = function(x,y){return(1)}){
-  list(n = n, a = a, c1 = c1, R = R, eps_final = eps_final, pacc_final = pacc_final, num_drop = num_drop, num_keep = num_keep, n_param = n_param, cov_func = cov_func, prior_eval = prior_eval)
-}
 
-abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, parallel, cl){
+
+abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, output_control, cl){
 
   param <- prior(1)
   control$n_param <- dim(param)[2]
   control <- do.call("abc_control.RABC", control)
+  output_control <- do.call("abc_output.RABC", output_control)
 
+  parallel <- ifelse(length(cl) == 0, FALSE, TRUE)
   lfunc <- make_lfunc(parallel)
 
   dist_col <- dim(param)[2] + 1
@@ -121,39 +124,48 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
       break;
     }
 
-    print("********************************");
+    if(output_control$print_output){
 
-    cat("Acceptance prob of MCMC was ",p_acc,"\n");
-    cat("Number of MCMC moves for next iteration is ",R,"\n");
-    cat("Number of unique particles is ", length(unique(input_params_s[,1])),"\n")
+      print("********************************");
 
-    # order the particles according to the distance
-    input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
+      cat("Acceptance prob of MCMC was ",p_acc,"\n");
+      cat("Number of MCMC moves for next iteration is ",R,"\n");
+      cat("Number of unique particles is ", length(unique(input_params_s[,1])),"\n")
 
-    dist_next <- input_params_s[control$num_keep, dist_col]
-    dist_max <- input_params_s[control$n, dist_col]
+      # order the particles according to the distance
+      input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
 
-    cat("dist_max is ",dist_max,"\n");
-    cat("dist_next is ",dist_next,"\n");
+      dist_next <- input_params_s[control$num_keep, dist_col]
+      dist_max <- input_params_s[control$n, dist_col]
+
+      cat("dist_max is ",dist_max,"\n");
+      cat("dist_next is ",dist_next,"\n");
+    }
 
 
   }
 
-  output <- as.data.frame(input_params_s[,-dist_col])
-  names(output) <- names(param)
+  if(output_control$include_dist){
+    output <- as.data.frame(input_params_s)
+    names(output) <- c(names(param), "distance")
+  } else {
+    output <- as.data.frame(input_params_s[,-dist_col])
+    names(output) <- names(param)
+  }
 
   return(output)
 
 }
 
-RABC_core <-
-  function(input_params_s,
-           dist_next,
-           num_keep,
-           R,
-           rw_cov,
-           distance,
-           prior_eval) {
+RABC_core <- function(
+  input_params_s,
+  dist_next,
+  num_keep,
+  R,
+  rw_cov,
+  distance,
+  prior_eval) {
+
     # resample from the particle population
     input_params_s <- as.numeric(input_params_s)
 

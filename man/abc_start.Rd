@@ -5,7 +5,7 @@
 \title{ABC algorithm}
 \usage{
 abc_start(prior, distance, transition = NA, method = "rejection",
-  control = list(), parallel = FALSE, cl = NULL)
+  control = list(), output_control = list(), cl = list())
 }
 \arguments{
 \item{prior}{function for prior}
@@ -16,7 +16,9 @@ abc_start(prior, distance, transition = NA, method = "rejection",
 
 \item{method}{algorithm to use}
 
-\item{options}{list of options to use in algorithm}
+\item{control}{list of options to use in algorithm}
+
+\item{output_control}{list of options for controlling output of algorithm}
 }
 \description{
 ABC algorithm
@@ -33,7 +35,6 @@ abc_post_1 <- abc_start(
   prior,
   distance,
   method = "rejection",
-  parallel = FALSE,
   control = list(epsilon = 0.1)
 )
 
@@ -52,7 +53,6 @@ abc_post_2 <- abc_start(
   prior,
   distance,
   method = "rejection",
-  parallel = FALSE,
   control = list(epsilon = 0.1)
 )
 
@@ -63,7 +63,6 @@ abc_post_2 <- abc_start(
   prior,
   distance,
   method = "RABC",
-  parallel = FALSE,
   control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))})
 )
 

@@ -5,7 +5,8 @@
 #' @param distance function for distance comp
 #' @param transition function for transition
 #' @param method algorithm to use
-#' @param options list of options to use in algorithm
+#' @param control list of options to use in algorithm
+#' @param output_control list of options for controlling output of algorithm
 #' @examples
 #' prior <- function(n){data.frame(mean = rnorm(n, 5))}
 #' distance <- function(x){
@@ -18,7 +19,6 @@
 #'   prior,
 #'   distance,
 #'   method = "rejection",
-#'   parallel = FALSE,
 #'   control = list(epsilon = 0.1)
 #' )
 #'
@@ -37,7 +37,6 @@
 #'   prior,
 #'   distance,
 #'   method = "rejection",
-#'   parallel = FALSE,
 #'   control = list(epsilon = 0.1)
 #' )
 #'
@@ -48,17 +47,16 @@
 #'   prior,
 #'   distance,
 #'   method = "RABC",
-#'   parallel = FALSE,
 #'   control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))})
 #' )
 #'
 #' @export
-abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), parallel = FALSE, cl = NULL){
+abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), output_control = list(), cl = list()){
 
   algorithm <- NA
   class(algorithm) <- method
 
-  output <- abc_algorithm(prior, distance, transition, algorithm, control, parallel, cl)
+  output <- abc_algorithm(prior, distance, transition, algorithm, control, output_control, cl)
 
   return(output)
 }
