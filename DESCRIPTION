@@ -1,13 +1,14 @@
 Package: protoABC
 Title: Prototyping ABC schemes
-Version: 0.1.1
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Version: 0.1.2
+Authors@R: person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.3)
 Imports: 
   dplyr, 
   stats, 
-  MASS
+  MASS, 
+  parallel
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

@@ -2,26 +2,37 @@
 % Please edit documentation in R/abc_core.R
 \name{abc_start}
 \alias{abc_start}
-\title{ABC algorithm}
+\title{Start abc inference}
 \usage{
 abc_start(prior, distance, transition = NA, method = "rejection",
   control = list(), output_control = list(), cl = list())
 }
 \arguments{
-\item{prior}{function for prior}
+\item{prior}{function to sample from prior.}
 
-\item{distance}{function for distance comp}
+\item{distance}{function to compute distance for proposal.}
 
-\item{transition}{function for transition}
+\item{transition}{function for transition.}
 
-\item{method}{algorithm to use}
+\item{method}{a character string specifying the algorithm to use.}
 
-\item{control}{list of options to use in algorithm}
+\item{control}{list of options to use in algorithm.}
 
-\item{output_control}{list of options for controlling output of algorithm}
+\item{output_control}{list of options for controlling output of algorithm.}
+
+\item{cl}{an object of class "cluster".}
 }
 \description{
-ABC algorithm
+Start abc inference
+}
+\details{
+\code{abc_interface} takes a function for the prior and a function for the distance as arguments. The \code{prior} function must take a single integer \eqn{n} as the argument and return a dataframe with \eqn{n} rows, the number of columns represents the number of parameters in your system. The \code{distance} function must take a numeric vector of length equal to the number of parameters in your system and return a single positive number, the distance.
+
+Note that other things normally considered part of ABC inference such as: observed data, simulated data and summary statistics are not seen by the algorithm but are defined beforehand by the user. For instance the distance returned by the distance function would normally be considered to be a distance between observed and simulated summary statistics, rather than a mapping from the space of parameters. In the design of this package we have simply skipped the intermediary steps so that the interface for the user is as flexible as possible.
+
+The \code{transition} argument has yet to be implemented. The \code{method} argument specifies the ABC algorithm to use to infer parameters, current options include \code{"rejection"} and \code{"RABC"}. The \code{control} argument takes a list of optional input values to be used in the ABC algorithm specified. The \code{output_control} argument takes a list of option input values to control how the output is returned to the user.
+
+The function is parallelised in much the same way as \code{\link{parLapply}} for instance. The user creates a cluster object \code{cl} with the \code{\link{makeCluster}} command and inputs \code{cl} as an argument to the function. The same troubleshooting procedures can be used as with \code{\link{parLapply}}, for instance if a node does not have access to objects in your environment use \code{\link{clusterExport}}.
 }
 \examples{
 prior <- function(n){data.frame(mean = rnorm(n, 5))}
