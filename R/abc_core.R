@@ -80,9 +80,9 @@ make_lfunc <- function(parallel){
          }
   )
 
-  if(parallel){
-    parallel::clusterExport(cl, "distance")
-  }
+  # if(parallel){
+  #   parallel::clusterExport(cl, "distance")
+  # }
 
   return(output)
 }
