@@ -1,24 +1,33 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-protoABC
-========
 
-The goal of protoABC is to provide an interface to ABC inference which is as flexible as possible.
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
 
-Installation
-------------
+# protoABC
+
+The goal of protoABC is to provide an interface to ABC inference which is as flexible as possible. 
+
+## Installation
 
 You can install protoABC from github with:
 
-``` r
+```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("AnthonyEbert/protoABC", auth_token = "0f7acf8a9c7faa1c678ce5fd8afb195badbca24b")
 ```
 
-Example
--------
+## Example
 
-``` r
+```{r example}
 
 library(protoABC)
 
@@ -40,13 +49,6 @@ abc_post_1 <- abc_start(
 )
 
 summary(abc_post_1)
-#>        mu       
-#>  Min.   :2.823  
-#>  1st Qu.:2.961  
-#>  Median :3.013  
-#>  Mean   :3.010  
-#>  3rd Qu.:3.063  
-#>  Max.   :3.159
 
 # Infer mean and standard deviation for normal distribution given that observed sample average is 3 and observed standard deviation estimate is 1
 
@@ -68,11 +70,8 @@ abc_post_2 <- abc_start(
 )
 
 summary(abc_post_2)
-#>        mu             sdp          
-#>  Min.   :2.021   Min.   :0.005847  
-#>  1st Qu.:2.624   1st Qu.:0.382364  
-#>  Median :3.008   Median :0.694683  
-#>  Mean   :3.020   Mean   :0.767758  
-#>  3rd Qu.:3.418   3rd Qu.:1.083556  
-#>  Max.   :3.976   Max.   :1.991111
 ```
+
+
+
+
