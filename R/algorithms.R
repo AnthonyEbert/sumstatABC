@@ -131,12 +131,15 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
       cat("Acceptance prob of MCMC was ",p_acc,"\n");
       cat("Number of MCMC moves for next iteration is ",R,"\n");
       cat("Number of unique particles is ", length(unique(input_params_s[,1])),"\n")
+    }
 
       # order the particles according to the distance
-      input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
+    input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
 
-      dist_next <- input_params_s[control$num_keep, dist_col]
-      dist_max <- input_params_s[control$n, dist_col]
+    dist_next <- input_params_s[control$num_keep, dist_col]
+    dist_max <- input_params_s[control$n, dist_col]
+
+    if(output_control$print_output){
 
       cat("dist_max is ",dist_max,"\n");
       cat("dist_next is ",dist_next,"\n");

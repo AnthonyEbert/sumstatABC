@@ -41,18 +41,27 @@ abc_post_1 <- abc_start(
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.823  
+#>  Min.   :2.837  
 #>  1st Qu.:2.961  
-#>  Median :3.013  
+#>  Median :3.012  
 #>  Mean   :3.010  
-#>  3rd Qu.:3.063  
-#>  Max.   :3.159
+#>  3rd Qu.:3.059  
+#>  Max.   :3.166
+```
 
+``` r
 # Infer mean and standard deviation for normal distribution given that observed sample average is 3 and observed standard deviation estimate is 1
 
 prior <- function(n){
   data.frame(mu = runif(n, 2, 4), sdp = rgamma(n, 1, 1))
 }
+
+prior_eval <- function(theta){
+  prior_value <- dunif(theta[1], 2, 4) * dgamma(theta[2], 1, 1)
+  
+  return(prior_value)
+}
+
 
 distance <- function(theta){
   data <- rnorm(1000, theta[1], theta[2])
@@ -63,16 +72,17 @@ distance <- function(theta){
 abc_post_2 <- abc_start(
   prior,
   distance,
-  method = "rejection",
-  control = list(epsilon = 1)
+  method = "RABC",
+  control = list(n = 1000, prior_eval = prior_eval, pacc_final = 0.1), 
+  output_control = list(print_output = FALSE)
 )
 
 summary(abc_post_2)
-#>        mu             sdp          
-#>  Min.   :2.021   Min.   :0.005847  
-#>  1st Qu.:2.624   1st Qu.:0.382364  
-#>  Median :3.008   Median :0.694683  
-#>  Mean   :3.020   Mean   :0.767758  
-#>  3rd Qu.:3.418   3rd Qu.:1.083556  
-#>  Max.   :3.976   Max.   :1.991111
+#>        mu             sdp        
+#>  Min.   :2.907   Min.   :0.9379  
+#>  1st Qu.:2.979   1st Qu.:0.9841  
+#>  Median :3.000   Median :0.9998  
+#>  Mean   :3.002   Mean   :1.0005  
+#>  3rd Qu.:3.023   3rd Qu.:1.0177  
+#>  Max.   :3.111   Max.   :1.0759
 ```
