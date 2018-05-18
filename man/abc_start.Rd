@@ -66,7 +66,7 @@ prior <- function(n){
 }
 
 distance <- function(theta, data){
-  sim <- rnorm(1000, theta[1], theta[2])
+  sim <- rnorm(1000, theta["mean"], theta["sd"])
   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
   return(output)
 }
@@ -87,7 +87,7 @@ abc_post_3 <- abc_start(
   distance,
   data = observed_data,
   method = "RABC",
-  control = list(prior_eval = function(theta){return(ifelse(theta[1] < 2 | theta[1] > 4 | theta[2] <= 0, 0, 1))})
+  control = list(prior_eval = function(theta){return(ifelse(theta["mean"] < 2 | theta["mean"] > 4 | theta["sd"] <= 0, 0, 1))})
 )
 
 hist(abc_post_3$mean)
