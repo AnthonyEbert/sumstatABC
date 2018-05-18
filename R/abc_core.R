@@ -3,7 +3,7 @@
 #' Start abc inference
 #' @param prior function to sample from prior.
 #' @param distance function to compute distance for proposal.
-#' @param transition function for transition.
+#' @param data some R object (anything) which is passed as an argument to the distance function. Usually used to pass the observed data to the distance function.
 #' @param method a character string specifying the algorithm to use.
 #' @param control list of options to use in algorithm.
 #' @param output_control list of options for controlling output of algorithm.
@@ -18,16 +18,23 @@
 #' The function is parallelised in much the same way as \code{\link{parLapply}} for instance. The user creates a cluster object \code{cl} with the \code{\link{makeCluster}} command and inputs \code{cl} as an argument to the function. The same troubleshooting procedures can be used as with \code{\link{parLapply}}, for instance if a node does not have access to objects in your environment use \code{\link{clusterExport}}.
 #'
 #' @examples
-#' prior <- function(n){data.frame(mean = rnorm(n, 5))}
-#' distance <- function(x){
-#'   data <- rnorm(1000, x)
-#'   output <- abs(mean(data) - 3)
+#'
+#' observed_data <- rnorm(1000, 3)
+#'
+#' prior <- function(n){
+#'   data.frame(mean = rnorm(n, 5))
+#' }
+#'
+#' distance <- function(x, data){
+#'   sim <- rnorm(1000, x)
+#'   output <- abs(mean(sim) - mean(data))
 #'   return(output)
 #' }
 #'
 #' abc_post_1 <- abc_start(
 #'   prior,
 #'   distance,
+#'   data = observed_data,
 #'   method = "rejection",
 #'   control = list(epsilon = 0.1)
 #' )
@@ -35,38 +42,46 @@
 #' hist(abc_post_1$mean)
 #'
 #' prior <- function(n){
-#'   data.frame(mean = runif(n, 2, 4), sd = rgamma(n, 1, 1))
+#'   data.frame(
+#'     mean = runif(n, 2, 4),
+#'     sd = rgamma(n, 1, 1)
+#'   )
 #' }
-#' distance <- function(x){
-#'   data <- rnorm(1000, x[1], x[2])
-#'   output <- sqrt( (mean(data) - 3)^2 + (sd(data) - 1)^2)
+#'
+#' distance <- function(x, data){
+#'   sim <- rnorm(1000, x[1], x[2])
+#'   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
 #'   return(output)
 #' }
 #'
 #' abc_post_2 <- abc_start(
 #'   prior,
 #'   distance,
+#'   data = observed_data,
 #'   method = "rejection",
 #'   control = list(epsilon = 0.1)
 #' )
 #'
 #' hist(abc_post_2$mean)
-#' hist(abc_post_2$mean)
+#' hist(abc_post_2$sd)
 #'
-#' abc_post_2 <- abc_start(
+#' abc_post_3 <- abc_start(
 #'   prior,
 #'   distance,
+#'   data = observed_data,
 #'   method = "RABC",
 #'   control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))})
 #' )
 #'
+#' hist(abc_post_3$mean)
+#' hist(abc_post_3$sd)
 #' @export
-abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), output_control = list(), cl = list(), ...){
+abc_start <- function(prior, distance, data = list(), method = "rejection", control = list(), output_control = list(), cl = list()){
 
   algorithm <- NA
   class(algorithm) <- method
 
-  output <- abc_algorithm(prior, distance, transition, algorithm, control, output_control, cl, ...)
+  output <- abc_algorithm(prior, distance, data, algorithm, control, output_control, cl)
 
   return(output)
 }
