@@ -1,12 +1,12 @@
 
 
-abc_algorithm <- function(prior, distance, transition, algorithm, control, output_control, cl){
+abc_algorithm <- function(prior, distance, data, algorithm, control, output_control, cl){
   UseMethod("abc_algorithm", algorithm)
 }
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, output_control, cl){
+abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, output_control, cl){
 
   control <- do.call("abc_control.rejection", control)
   output_control <- do.call("abc_output.rejection", output_control)
@@ -24,7 +24,7 @@ abc_algorithm.rejection <- function(prior, distance, transition, algorithm, cont
 
   while(dim(output)[1] < control$n){
 
-    new_output <- rejection_core(n, prior, distance, lfunc)
+    new_output <- rejection_core(n, prior, distance, lfunc, data = data)
 
     #new_output <- matrix(unlist(new_output), ncol = dist_col, byrow = TRUE)
 
@@ -51,16 +51,16 @@ abc_algorithm.rejection <- function(prior, distance, transition, algorithm, cont
 
 }
 
-rejection_core <- function(n, prior, distance, lfunc){
+rejection_core <- function(n, prior, distance, lfunc, data){
   param <- prior(n)
 
-  new_output <- lfunc(as.matrix(param), 1, function(i, ...) {
+  new_output <- lfunc(as.matrix(param), 1, function(i, data, distance) {
 
-    out <- distance(i)
+    out <- distance(i, data)
 
     return(c(i, out))
 
-  })
+  }, data = data, distance = ifelse(length(data) == 0, function(i, data){distance(i)}, distance))
 
   return(t(new_output))
 }
@@ -70,7 +70,7 @@ rejection_core <- function(n, prior, distance, lfunc){
 
 
 
-abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, output_control, cl){
+abc_algorithm.RABC <- function(prior, distance, data, algorithm, control, output_control, cl){
 
   param <- prior(1)
   control$n_param <- dim(param)[2]
@@ -83,7 +83,7 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
 
-  trial_run <- rejection_core(control$n, prior, distance, lfunc)
+  trial_run <- rejection_core(control$n, prior, distance, lfunc, data = data)
 
   input_params_s <- trial_run[order(trial_run[,dist_col]), ]
 
@@ -104,11 +104,12 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
       input_params_s[index_resample_f, ],
       1,
       RABC_core,
+      data = data,
       dist_next = dist_next,
       num_keep = control$num_keep,
       R = R,
       rw_cov = rw_cov,
-      distance = distance,
+      distance = ifelse(length(data) == 0, function(i, data){distance(i)}, distance),
       prior_eval = control$prior_eval
     )
 
@@ -124,15 +125,6 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
       break;
     }
 
-    if(output_control$print_output){
-
-      print("********************************");
-
-      cat("Acceptance prob of MCMC was ",p_acc,"\n");
-      cat("Number of MCMC moves for next iteration is ",R,"\n");
-      cat("Number of unique particles is ", length(unique(input_params_s[,1])),"\n")
-    }
-
       # order the particles according to the distance
     input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
 
@@ -141,8 +133,14 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
 
     if(output_control$print_output){
 
-      cat("dist_max is ",dist_max,"\n");
-      cat("dist_next is ",dist_next,"\n");
+      message("********************************");
+
+      message("Acceptance prob of MCMC was ",p_acc);
+      message("Number of MCMC moves for next iteration is ",R);
+      message("Number of unique particles is ", length(unique(input_params_s[,1])))
+
+      message("dist_max is ",dist_max);
+      message("dist_next is ",dist_next);
     }
 
 
@@ -162,6 +160,7 @@ abc_algorithm.RABC <- function(prior, distance, transition, algorithm, control, 
 
 RABC_core <- function(
   input_params_s,
+  data,
   dist_next,
   num_keep,
   R,
@@ -170,17 +169,23 @@ RABC_core <- function(
   prior_eval) {
 
     # resample from the particle population
+    param_names <- names(input_params_s)
+
+
     input_params_s <- as.numeric(input_params_s)
 
     iacc <- 0
-    input_params <- as.numeric(input_params_s[-length(input_params_s)])
+    input_params <- input_params_s[-length(input_params_s)]
     input_s      <- as.numeric(input_params_s[length(input_params_s)])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
       # repeat
 
-      prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(input_params, ncol = 1), rw_cov))
+      prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(as.numeric(input_params), ncol = 1), rw_cov))
+
+      names(prop) <- param_names[-length(input_params_s)]
+      names(input_params) <- names(prop)
 
       #check if its within the prior distribution
 
@@ -188,7 +193,7 @@ RABC_core <- function(
         next
       }
 
-      dist_prop = distance(as.numeric(prop))
+      dist_prop = distance(prop, data)
 
 
       if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > runif(1)) {
