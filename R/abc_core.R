@@ -61,12 +61,12 @@
 #' )
 #'
 #' @export
-abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), output_control = list(), cl = list()){
+abc_start <- function(prior, distance, transition = NA, method = "rejection", control = list(), output_control = list(), cl = list(), ...){
 
   algorithm <- NA
   class(algorithm) <- method
 
-  output <- abc_algorithm(prior, distance, transition, algorithm, control, output_control, cl)
+  output <- abc_algorithm(prior, distance, transition, algorithm, control, output_control, cl, ...)
 
   return(output)
 }

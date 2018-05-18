@@ -5,7 +5,7 @@
 \title{Start abc inference}
 \usage{
 abc_start(prior, distance, transition = NA, method = "rejection",
-  control = list(), output_control = list(), cl = list())
+  control = list(), output_control = list(), cl = list(), ...)
 }
 \arguments{
 \item{prior}{function to sample from prior.}

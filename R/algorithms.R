@@ -1,12 +1,12 @@
 
 
-abc_algorithm <- function(prior, distance, transition, algorithm, control, output_control, cl){
+abc_algorithm <- function(prior, distance, transition, algorithm, control, output_control, cl, ...){
   UseMethod("abc_algorithm", algorithm)
 }
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, output_control, cl){
+abc_algorithm.rejection <- function(prior, distance, transition, algorithm, control, output_control, cl, ...){
 
   control <- do.call("abc_control.rejection", control)
   output_control <- do.call("abc_output.rejection", output_control)
@@ -24,7 +24,7 @@ abc_algorithm.rejection <- function(prior, distance, transition, algorithm, cont
 
   while(dim(output)[1] < control$n){
 
-    new_output <- rejection_core(n, prior, distance, lfunc)
+    new_output <- rejection_core(n, prior, distance, lfunc, ...)
 
     #new_output <- matrix(unlist(new_output), ncol = dist_col, byrow = TRUE)
 
@@ -51,12 +51,12 @@ abc_algorithm.rejection <- function(prior, distance, transition, algorithm, cont
 
 }
 
-rejection_core <- function(n, prior, distance, lfunc){
+rejection_core <- function(n, prior, distance, lfunc, ...){
   param <- prior(n)
 
-  new_output <- lfunc(as.matrix(param), 1, function(i, ...) {
+  new_output <- lfunc(as.matrix(param), 1, function(i) {
 
-    out <- distance(i)
+    out <- distance(i, ...)
 
     return(c(i, out))
 
