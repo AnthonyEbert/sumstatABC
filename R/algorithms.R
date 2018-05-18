@@ -6,7 +6,7 @@ abc_algorithm <- function(prior, distance, data, algorithm, control, output_cont
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, output_control, cl, ...){
+abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, output_control, cl){
 
   control <- do.call("abc_control.rejection", control)
   output_control <- do.call("abc_output.rejection", output_control)
@@ -172,17 +172,23 @@ RABC_core <- function(
   prior_eval) {
 
     # resample from the particle population
+    param_names <- names(input_params_s)
+
+
     input_params_s <- as.numeric(input_params_s)
 
     iacc <- 0
-    input_params <- as.numeric(input_params_s[-length(input_params_s)])
+    input_params <- input_params_s[-length(input_params_s)]
     input_s      <- as.numeric(input_params_s[length(input_params_s)])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
       # repeat
 
-      prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(input_params, ncol = 1), rw_cov))
+      prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(as.numeric(input_params), ncol = 1), rw_cov))
+
+      names(prop) <- param_names[-length(input_params_s)]
+      names(input_params) <- names(prop)
 
       #check if its within the prior distribution
 
@@ -190,7 +196,7 @@ RABC_core <- function(
         next
       }
 
-      dist_prop = distance(as.numeric(prop), data)
+      dist_prop = distance(prop, data)
 
 
       if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > runif(1)) {

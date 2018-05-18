@@ -42,8 +42,8 @@ prior <- function(n){
   data.frame(mean = rnorm(n, 5))
 }
 
-distance <- function(x, data){
-  sim <- rnorm(1000, x)
+distance <- function(theta, data){
+  sim <- rnorm(1000, theta)
   output <- abs(mean(sim) - mean(data))
   return(output)
 }
@@ -65,8 +65,8 @@ prior <- function(n){
   )
 }
 
-distance <- function(x, data){
-  sim <- rnorm(1000, x[1], x[2])
+distance <- function(theta, data){
+  sim <- rnorm(1000, theta[1], theta[2])
   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
   return(output)
 }
@@ -87,7 +87,7 @@ abc_post_3 <- abc_start(
   distance,
   data = observed_data,
   method = "RABC",
-  control = list(prior_eval = function(x){return(ifelse(x[1] < 2 | x[1] > 4 | x[2] <= 0, 0, 1))})
+  control = list(prior_eval = function(theta){return(ifelse(theta[1] < 2 | theta[1] > 4 | theta[2] <= 0, 0, 1))})
 )
 
 hist(abc_post_3$mean)

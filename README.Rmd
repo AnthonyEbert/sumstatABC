@@ -31,19 +31,24 @@ devtools::install_github("AnthonyEbert/protoABC", auth_token = "0f7acf8a9c7faa1c
 
 library(protoABC)
 
-# Infer mean parameter for normal distribution given that observed sample average is 3
+# Infer mean parameter for normal distribution from some observed data
+
+data <- rnorm(1000, 3, 1.5)
+
+summary(data)
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
-distance <- function(theta){
-  data <- rnorm(1000, theta)
-  output <- abs(mean(data) - 3)
+distance <- function(theta, data){
+  sim <- rnorm(1000, theta)
+  output <- abs(mean(sim) - mean(data))
   return(output)
 }
 
 abc_post_1 <- abc_start(
   prior,
   distance,
+  data,
   method = "rejection",
   control = list(epsilon = 0.1)
 )
@@ -53,28 +58,29 @@ summary(abc_post_1)
 
 
 ```{r}
-# Infer mean and standard deviation for normal distribution given that observed sample average is 3 and observed standard deviation estimate is 1
+# Infer mean and standard deviation for normal distribution given some observed data
 
 prior <- function(n){
-  data.frame(mu = runif(n, 2, 4), sdp = rgamma(n, 1, 1))
+  data.frame(mu = runif(n, 2, 4), sd = rgamma(n, 1, 1))
 }
 
 prior_eval <- function(theta){
-  prior_value <- dunif(theta[1], 2, 4) * dgamma(theta[2], 1, 1)
+  prior_value <- dunif(theta["mu"], 2, 4) * dgamma(theta["sd"], 1, 1)
   
   return(prior_value)
 }
 
 
-distance <- function(theta){
-  data <- rnorm(1000, theta[1], theta[2])
-  output <- sqrt( (mean(data) - 3)^2 + (sd(data) - 1)^2)
+distance <- function(theta, data){
+  sim <- rnorm(1000, theta["mu"], theta["sd"])
+  output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
   return(output)
 }
 
 abc_post_2 <- abc_start(
   prior,
   distance,
+  data,
   method = "RABC",
   control = list(n = 1000, prior_eval = prior_eval, pacc_final = 0.1), 
   output_control = list(print_output = FALSE)
