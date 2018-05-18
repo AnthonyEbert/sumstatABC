@@ -38,7 +38,7 @@
 #'   distance,
 #'   data = observed_data,
 #'   method = "rejection",
-#'   control = list(epsilon = 0.1)
+#'   control = list(epsilon = 0.1, n = 100)
 #' )
 #'
 #' hist(abc_post_1$mean)
@@ -55,7 +55,7 @@
 #' }
 #'
 #' distance <- function(theta, data){
-#'   sim <- rnorm(1000, theta[["mean"]], theta[["sd"]])
+#'   sim <- rnorm(1000, theta["mean"], theta["sd"])
 #'   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
 #'   return(output)
 #' }
@@ -65,7 +65,7 @@
 #'   distance,
 #'   data = observed_data,
 #'   method = "rejection",
-#'   control = list(epsilon = 0.1)
+#'   control = list(epsilon = 0.1, n = 100)
 #' )
 #'
 #' hist(abc_post_2$mean)
@@ -73,14 +73,22 @@
 #'
 #' ## Replenishment ABC
 #'
-#' prior_eval = function(theta){return(ifelse(theta[["mean"]] < 2 | theta[["mean"]] > 4 | theta[["sd"]] <= 0, 0, 1))}
+#' prior_eval = function(theta){
+#'   return(
+#'     ifelse(
+#'       theta[["mean"]] < 2 |
+#'         theta[["mean"]] > 4 |
+#'         theta[["sd"]] <= 0, 0, 1
+#'       )
+#'   )
+#' }
 #'
 #' abc_post_3 <- abc_start(
 #'   prior,
 #'   distance,
 #'   data = observed_data,
 #'   method = "RABC",
-#'   control = list(prior_eval = prior_eval)
+#'   control = list(prior_eval = prior_eval, n = 100)
 #' )
 #'
 #' hist(abc_post_3$mean)
@@ -96,7 +104,8 @@
 #'   prior,
 #'   distance,
 #'   data = observed_data,
-#'   cl = cl
+#'   cl = cl,
+#'   control = list(n = 100)
 #' )
 #'
 #' }

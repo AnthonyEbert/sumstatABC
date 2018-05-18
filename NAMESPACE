@@ -2,4 +2,4 @@
 
 export(abc_start)
 export(prior_unif)
-importFrom(dplyr,"%>%")
+importFrom(magrittr,"%>%")

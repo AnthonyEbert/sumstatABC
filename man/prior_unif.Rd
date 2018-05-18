@@ -11,6 +11,8 @@ prior_unif(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE)
 
 \item{rhs_lim}{vector}
 
+\item{var_names}{optional character vector of parameter names}
+
 \item{eval}{boolean}
 }
 \description{

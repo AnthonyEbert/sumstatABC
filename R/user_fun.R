@@ -5,8 +5,9 @@
 #' Make a uniform prior
 #' @param lhs_lim vector
 #' @param rhs_lim vector
+#' @param var_names optional character vector of parameter names
 #' @param eval boolean
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @export
 prior_unif <- function(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE){
 
