@@ -6,7 +6,6 @@
 abc_control.rejection <- function(
   n = 1000,
   epsilon = 0.05,
-  full_output = FALSE,
   delta = 1e-3){
 
   return(as.list(environment(), all=TRUE))

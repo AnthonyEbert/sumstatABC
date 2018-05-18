@@ -48,6 +48,8 @@ distance <- function(theta, data){
   return(output)
 }
 
+# ABC with mean parameter ---------------
+
 abc_post_1 <- abc_start(
   prior,
   distance,
@@ -58,6 +60,10 @@ abc_post_1 <- abc_start(
 
 hist(abc_post_1$mean)
 
+# ABC with mean and sd parameters ---------
+
+## Rejection ABC
+
 prior <- function(n){
   data.frame(
     mean = runif(n, 2, 4),
@@ -66,7 +72,7 @@ prior <- function(n){
 }
 
 distance <- function(theta, data){
-  sim <- rnorm(1000, theta["mean"], theta["sd"])
+  sim <- rnorm(1000, theta[["mean"]], theta[["sd"]])
   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
   return(output)
 }
@@ -82,14 +88,35 @@ abc_post_2 <- abc_start(
 hist(abc_post_2$mean)
 hist(abc_post_2$sd)
 
+## Replenishment ABC
+
+prior_eval = function(theta){return(ifelse(theta[["mean"]] < 2 | theta[["mean"]] > 4 | theta[["sd"]] <= 0, 0, 1))}
+
 abc_post_3 <- abc_start(
   prior,
   distance,
   data = observed_data,
   method = "RABC",
-  control = list(prior_eval = function(theta){return(ifelse(theta["mean"] < 2 | theta["mean"] > 4 | theta["sd"] <= 0, 0, 1))})
+  control = list(prior_eval = prior_eval)
 )
 
 hist(abc_post_3$mean)
 hist(abc_post_3$sd)
+
+# ABC in parallel! ---------------
+
+\dontrun{
+library(parallel)
+cl <- makeCluster(detectCores())
+
+abc_post_4 <- abc_start(
+  prior,
+  distance,
+  data = observed_data,
+  cl = cl
+)
+
+}
+
+
 }
