@@ -32,7 +32,7 @@ abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, o
 
     output <- rbind(output, new_output)
 
-    n <- (control$n - (dim(output)[1]))/(dim(new_output)[1] / n + control$delta)
+    n <- max(1, as.integer((control$n - (dim(output)[1]))/(dim(new_output)[1] / n + control$delta)))
 
     #print(dim(output)[1])
   }

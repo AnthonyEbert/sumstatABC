@@ -1,6 +1,6 @@
 Package: protoABC
 Title: Prototyping ABC schemes
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), person("Christopher", "Drovandi", email = "c.drovandi@qut.edu.au", role = c("aut")))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4)
