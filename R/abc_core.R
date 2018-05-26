@@ -123,8 +123,6 @@ abc_start <- function(prior, distance, distance_args = NULL, method = "rejection
 
   distance <- ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance)
 
-  stopifnot(is.numeric(distance(prior(1)[,1], distance_args)) & length(distance(prior(1)[,1], distance_args)) == 1)
-
   output <- abc_algorithm(prior, distance, distance_args, algorithm, control, output_control, lfunc)
 
   return(output)
