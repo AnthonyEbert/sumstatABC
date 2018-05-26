@@ -1,12 +1,12 @@
 
 
-abc_algorithm <- function(prior, distance, data, algorithm, control, output_control, cl){
+abc_algorithm <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
   UseMethod("abc_algorithm", algorithm)
 }
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, output_control, cl){
+abc_algorithm.rejection <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
 
   control <- do.call("abc_control.rejection", control)
   output_control <- do.call("abc_output.rejection", output_control)
@@ -24,7 +24,7 @@ abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, o
 
   while(dim(output)[1] < control$n){
 
-    new_output <- rejection_core(n, prior, distance, lfunc, data = data)
+    new_output <- rejection_core(n, prior, distance, lfunc, distance_args = distance_args)
 
     #new_output <- matrix(unlist(new_output), ncol = dist_col, byrow = TRUE)
 
@@ -51,16 +51,16 @@ abc_algorithm.rejection <- function(prior, distance, data, algorithm, control, o
 
 }
 
-rejection_core <- function(n, prior, distance, lfunc, data){
+rejection_core <- function(n, prior, distance, lfunc, distance_args){
   param <- prior(n)
 
-  new_output <- lfunc(as.matrix(param), 1, function(i, data, distance) {
+  new_output <- lfunc(as.matrix(param), 1, function(i, distance_args, distance) {
 
-    out <- distance(i, data)
+    out <- distance(i, distance_args)
 
     return(c(i, out))
 
-  }, data = data, distance = ifelse(length(data) == 0, function(i, data){distance(i)}, distance))
+  }, distance_args = distance_args, distance = ifelse(length(distance_args) == 0, function(i, distance_args){distance(i)}, distance))
 
   return(t(new_output))
 }
@@ -70,7 +70,7 @@ rejection_core <- function(n, prior, distance, lfunc, data){
 
 
 
-abc_algorithm.RABC <- function(prior, distance, data, algorithm, control, output_control, cl){
+abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
 
   param <- prior(1)
   control$n_param <- dim(param)[2]
@@ -83,7 +83,7 @@ abc_algorithm.RABC <- function(prior, distance, data, algorithm, control, output
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
 
-  trial_run <- rejection_core(control$n, prior, distance, lfunc, data = data)
+  trial_run <- rejection_core(control$n, prior, distance, lfunc, distance_args = distance_args)
 
   input_params_s <- trial_run[order(trial_run[,dist_col]), ]
 
@@ -104,12 +104,12 @@ abc_algorithm.RABC <- function(prior, distance, data, algorithm, control, output
       input_params_s[index_resample_f, ],
       1,
       RABC_core,
-      data = data,
+      distance_args = distance_args,
       dist_next = dist_next,
       num_keep = control$num_keep,
       R = R,
       rw_cov = rw_cov,
-      distance = ifelse(length(data) == 0, function(i, data){distance(i)}, distance),
+      distance = ifelse(length(distance_args) == 0, function(i, distance_args){distance(i)}, distance),
       prior_eval = control$prior_eval
     )
 
@@ -160,7 +160,7 @@ abc_algorithm.RABC <- function(prior, distance, data, algorithm, control, output
 
 RABC_core <- function(
   input_params_s,
-  data,
+  distance_args,
   dist_next,
   num_keep,
   R,
@@ -193,7 +193,7 @@ RABC_core <- function(
         next
       }
 
-      dist_prop = distance(prop, data)
+      dist_prop = distance(prop, distance_args)
 
 
       if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > runif(1)) {

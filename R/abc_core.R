@@ -3,7 +3,7 @@
 #' Start abc inference
 #' @param prior function to sample from prior.
 #' @param distance function to compute distance for proposal.
-#' @param data some R object (anything) which is passed as an argument to the distance function. Usually used to pass the observed data to the distance function.
+#' @param distance_args some R object (anything) which is passed as an argument to the distance function. Usually used to pass the observed data to the distance function.
 #' @param method a character string specifying the algorithm to use.
 #' @param control list of options to use in algorithm.
 #' @param output_control list of options for controlling output of algorithm.
@@ -25,9 +25,9 @@
 #'   data.frame(mean = rnorm(n, 5))
 #' }
 #'
-#' distance <- function(theta, data){
+#' distance <- function(theta, distance_args){
 #'   sim <- rnorm(1000, theta)
-#'   output <- abs(mean(sim) - mean(data))
+#'   output <- abs(mean(sim) - mean(distance_args))
 #'   return(output)
 #' }
 #'
@@ -36,7 +36,7 @@
 #' abc_post_1 <- abc_start(
 #'   prior,
 #'   distance,
-#'   data = observed_data,
+#'   distance_args = observed_data,
 #'   method = "rejection",
 #'   control = list(epsilon = 0.1, n = 100)
 #' )
@@ -54,16 +54,16 @@
 #'   )
 #' }
 #'
-#' distance <- function(theta, data){
+#' distance <- function(theta, distance_args){
 #'   sim <- rnorm(1000, theta["mean"], theta["sd"])
-#'   output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
+#'   output <- sqrt( (mean(sim) - mean(distance_args))^2 + (sd(sim) - sd(distance_args))^2)
 #'   return(output)
 #' }
 #'
 #' abc_post_2 <- abc_start(
 #'   prior,
 #'   distance,
-#'   data = observed_data,
+#'   distance_args = observed_data,
 #'   method = "rejection",
 #'   control = list(epsilon = 0.1, n = 100)
 #' )
@@ -86,7 +86,7 @@
 #' abc_post_3 <- abc_start(
 #'   prior,
 #'   distance,
-#'   data = observed_data,
+#'   distance_args = observed_data,
 #'   method = "RABC",
 #'   control = list(prior_eval = prior_eval, n = 100)
 #' )
@@ -103,7 +103,7 @@
 #' abc_post_4 <- abc_start(
 #'   prior,
 #'   distance,
-#'   data = observed_data,
+#'   distance_args = observed_data,
 #'   cl = cl,
 #'   control = list(n = 100)
 #' )
@@ -112,12 +112,12 @@
 #'
 #'
 #' @export
-abc_start <- function(prior, distance, data = list(), method = "rejection", control = list(), output_control = list(), cl = list()){
+abc_start <- function(prior, distance, distance_args = list(), method = "rejection", control = list(), output_control = list(), cl = list()){
 
   algorithm <- NA
   class(algorithm) <- method
 
-  output <- abc_algorithm(prior, distance, data, algorithm, control, output_control, cl)
+  output <- abc_algorithm(prior, distance, distance_args, algorithm, control, output_control, cl)
 
   return(output)
 }

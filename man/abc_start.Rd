@@ -4,7 +4,7 @@
 \alias{abc_start}
 \title{Start abc inference}
 \usage{
-abc_start(prior, distance, data = list(), method = "rejection",
+abc_start(prior, distance, distance_args = list(), method = "rejection",
   control = list(), output_control = list(), cl = list())
 }
 \arguments{
@@ -12,7 +12,7 @@ abc_start(prior, distance, data = list(), method = "rejection",
 
 \item{distance}{function to compute distance for proposal.}
 
-\item{data}{some R object (anything) which is passed as an argument to the distance function. Usually used to pass the observed data to the distance function.}
+\item{distance_args}{some R object (anything) which is passed as an argument to the distance function. Usually used to pass the observed data to the distance function.}
 
 \item{method}{a character string specifying the algorithm to use.}
 
@@ -42,9 +42,9 @@ prior <- function(n){
   data.frame(mean = rnorm(n, 5))
 }
 
-distance <- function(theta, data){
+distance <- function(theta, distance_args){
   sim <- rnorm(1000, theta)
-  output <- abs(mean(sim) - mean(data))
+  output <- abs(mean(sim) - mean(distance_args))
   return(output)
 }
 
@@ -53,7 +53,7 @@ distance <- function(theta, data){
 abc_post_1 <- abc_start(
   prior,
   distance,
-  data = observed_data,
+  distance_args = observed_data,
   method = "rejection",
   control = list(epsilon = 0.1, n = 100)
 )
@@ -71,16 +71,16 @@ prior <- function(n){
   )
 }
 
-distance <- function(theta, data){
+distance <- function(theta, distance_args){
   sim <- rnorm(1000, theta["mean"], theta["sd"])
-  output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
+  output <- sqrt( (mean(sim) - mean(distance_args))^2 + (sd(sim) - sd(distance_args))^2)
   return(output)
 }
 
 abc_post_2 <- abc_start(
   prior,
   distance,
-  data = observed_data,
+  distance_args = observed_data,
   method = "rejection",
   control = list(epsilon = 0.1, n = 100)
 )
@@ -103,7 +103,7 @@ prior_eval = function(theta){
 abc_post_3 <- abc_start(
   prior,
   distance,
-  data = observed_data,
+  distance_args = observed_data,
   method = "RABC",
   control = list(prior_eval = prior_eval, n = 100)
 )
@@ -120,7 +120,7 @@ cl <- makeCluster(detectCores())
 abc_post_4 <- abc_start(
   prior,
   distance,
-  data = observed_data,
+  distance_args = observed_data,
   cl = cl,
   control = list(n = 100)
 )
