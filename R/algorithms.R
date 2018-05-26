@@ -60,7 +60,7 @@ rejection_core <- function(n, prior, distance, lfunc, distance_args){
 
     return(c(i, out))
 
-  }, distance_args = distance_args, distance = ifelse(length(distance_args) == 0, function(i, distance_args){distance(i)}, distance))
+  }, distance_args = distance_args, distance = ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance))
 
   return(t(new_output))
 }
@@ -109,7 +109,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
       num_keep = control$num_keep,
       R = R,
       rw_cov = rw_cov,
-      distance = ifelse(length(distance_args) == 0, function(i, distance_args){distance(i)}, distance),
+      distance = ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance),
       prior_eval = control$prior_eval
     )
 

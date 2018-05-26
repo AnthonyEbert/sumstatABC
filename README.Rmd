@@ -33,22 +33,22 @@ library(protoABC)
 
 # Infer mean parameter for normal distribution from some observed data
 
-data <- rnorm(1000, 3, 1.5)
+distance_args <- rnorm(1000, 3, 1.5)
 
-summary(data)
+summary(distance_args)
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
-distance <- function(theta, data){
+distance <- function(theta, distance_args){
   sim <- rnorm(1000, theta)
-  output <- abs(mean(sim) - mean(data))
+  output <- abs(mean(sim) - mean(distance_args))
   return(output)
 }
 
 abc_post_1 <- abc_start(
   prior,
   distance,
-  data,
+  distance_args,
   method = "rejection",
   control = list(epsilon = 0.1)
 )
@@ -71,16 +71,16 @@ prior_eval <- function(theta){
 }
 
 
-distance <- function(theta, data){
+distance <- function(theta, distance_args){
   sim <- rnorm(1000, theta["mu"], theta["sd"])
-  output <- sqrt( (mean(sim) - mean(data))^2 + (sd(sim) - sd(data))^2)
+  output <- sqrt( (mean(sim) - mean(distance_args))^2 + (sd(sim) - sd(distance_args))^2)
   return(output)
 }
 
 abc_post_2 <- abc_start(
   prior,
   distance,
-  data,
+  distance_args,
   method = "RABC",
   control = list(n = 1000, prior_eval = prior_eval, pacc_final = 0.1), 
   output_control = list(print_output = FALSE)

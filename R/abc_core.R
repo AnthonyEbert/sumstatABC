@@ -112,7 +112,7 @@
 #'
 #'
 #' @export
-abc_start <- function(prior, distance, distance_args = list(), method = "rejection", control = list(), output_control = list(), cl = list()){
+abc_start <- function(prior, distance, distance_args = NULL, method = "rejection", control = list(), output_control = list(), cl = list()){
 
   algorithm <- NA
   class(algorithm) <- method

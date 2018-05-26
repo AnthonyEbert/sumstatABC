@@ -4,7 +4,7 @@
 \alias{abc_start}
 \title{Start abc inference}
 \usage{
-abc_start(prior, distance, distance_args = list(), method = "rejection",
+abc_start(prior, distance, distance_args = NULL, method = "rejection",
   control = list(), output_control = list(), cl = list())
 }
 \arguments{
