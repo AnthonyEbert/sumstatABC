@@ -25,7 +25,7 @@ prior_unif <- function(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE){
     output <- function(n){
       stopifnot(n %% 1 == 0 && n > 0)
 
-      out <- runif(length(lhs_lim) * n, lhs_lim, rhs_lim) %>%
+      out <- stats::runif(length(lhs_lim) * n, lhs_lim, rhs_lim) %>%
         matrix(ncol = length(lhs_lim), byrow = TRUE) %>%
         as.data.frame()
 

@@ -1,10 +1,10 @@
 Package: protoABC
 Title: Prototyping ABC schemes
-Version: 0.3.1
+Version: 0.4.0
 Authors@R: c(person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), person("Christopher", "Drovandi", email = "c.drovandi@qut.edu.au", role = c("aut")))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4)
-Imports: 
+Imports:
   magrittr, 
   stats, 
   MASS, 
@@ -13,3 +13,4 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Suggests: testthat

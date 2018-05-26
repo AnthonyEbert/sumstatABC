@@ -29,7 +29,7 @@ abc_control.RABC <- function(
   num_drop = n * a,
   num_keep = n - num_drop,
   n_param,
-  cov_func = ifelse(n_param == 1, var, cov),
+  cov_func = ifelse(n_param == 1, stats::var, stats::cov),
   prior_eval = function(x,y){return(1)}){
 
   return(as.list(environment(), all=TRUE))

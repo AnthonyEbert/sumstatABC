@@ -112,18 +112,26 @@
 #'
 #'
 #' @export
-abc_start <- function(prior, distance, distance_args = NULL, method = "rejection", control = list(), output_control = list(), cl = list()){
+abc_start <- function(prior, distance, distance_args = NULL, method = "rejection", control = list(), output_control = list(), cl = NULL){
 
   algorithm <- NA
   class(algorithm) <- method
 
-  output <- abc_algorithm(prior, distance, distance_args, algorithm, control, output_control, cl)
+  parallel <- ifelse(is.null(cl), FALSE, TRUE)
+
+  lfunc <- make_lfunc(parallel, cl)
+
+  distance <- ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance)
+
+  stopifnot(is.numeric(distance(prior(1)[,1], distance_args)) & length(distance(prior(1)[,1], distance_args)) == 1)
+
+  output <- abc_algorithm(prior, distance, distance_args, algorithm, control, output_control, lfunc)
 
   return(output)
 }
 
 
-make_lfunc <- function(parallel){
+make_lfunc <- function(parallel, cl){
   output <- ifelse(!parallel,
          apply,
          function(X, MARGIN, FUN, ...){

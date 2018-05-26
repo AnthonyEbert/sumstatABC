@@ -1,20 +1,17 @@
 
 
-abc_algorithm <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
+abc_algorithm <- function(prior, distance, distance_args, algorithm, control, output_control, lfunc){
   UseMethod("abc_algorithm", algorithm)
 }
 
 # Rejection
 
-abc_algorithm.rejection <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
+abc_algorithm.rejection <- function(prior, distance, distance_args, algorithm, control, output_control, lfunc){
 
   control <- do.call("abc_control.rejection", control)
   output_control <- do.call("abc_output.rejection", output_control)
 
   param <- prior(1)
-
-  parallel <- ifelse(length(cl) == 0, FALSE, TRUE)
-  lfunc <- make_lfunc(parallel)
 
   n <- control$n
 
@@ -60,7 +57,7 @@ rejection_core <- function(n, prior, distance, lfunc, distance_args){
 
     return(c(i, out))
 
-  }, distance_args = distance_args, distance = ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance))
+  }, distance_args = distance_args, distance = distance)
 
   return(t(new_output))
 }
@@ -70,15 +67,12 @@ rejection_core <- function(n, prior, distance, lfunc, distance_args){
 
 
 
-abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, control, output_control, cl){
+abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, control, output_control, lfunc){
 
   param <- prior(1)
   control$n_param <- dim(param)[2]
   control <- do.call("abc_control.RABC", control)
   output_control <- do.call("abc_output.RABC", output_control)
-
-  parallel <- ifelse(length(cl) == 0, FALSE, TRUE)
-  lfunc <- make_lfunc(parallel)
 
   dist_col <- dim(param)[2] + 1
   output <- matrix(ncol = dist_col, nrow = 0)
@@ -109,7 +103,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
       num_keep = control$num_keep,
       R = R,
       rw_cov = rw_cov,
-      distance = ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance),
+      distance = distance,
       prior_eval = control$prior_eval
     )
 
@@ -196,7 +190,7 @@ RABC_core <- function(
       dist_prop = distance(prop, distance_args)
 
 
-      if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > runif(1)) {
+      if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > stats::runif(1)) {
         # Metropolis-Hastings Ratio
         iacc <- iacc + 1
 
