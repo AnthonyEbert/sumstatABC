@@ -22,7 +22,7 @@ You can install protoABC from github with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("AnthonyEbert/protoABC", auth_token = "0f7acf8a9c7faa1c678ce5fd8afb195badbca24b")
+devtools::install_github("AnthonyEbert/protoABC")
 ```
 
 ## Example

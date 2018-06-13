@@ -28,7 +28,7 @@ distance_args <- rnorm(1000, 3, 1.5)
 
 summary(distance_args)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  -1.878   1.941   2.929   2.957   3.957   7.998
+#>  -2.175   2.088   3.011   3.036   4.068   8.109
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
@@ -48,12 +48,12 @@ abc_post_1 <- abc_start(
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.792  
-#>  1st Qu.:2.915  
-#>  Median :2.969  
-#>  Mean   :2.965  
-#>  3rd Qu.:3.017  
-#>  Max.   :3.134
+#>  Min.   :2.864  
+#>  1st Qu.:2.997  
+#>  Median :3.048  
+#>  Mean   :3.046  
+#>  3rd Qu.:3.094  
+#>  Max.   :3.200
 ```
 
 ``` r
@@ -84,16 +84,13 @@ abc_post_2 <- abc_start(
   control = list(n = 1000, prior_eval = prior_eval, pacc_final = 0.1), 
   output_control = list(print_output = FALSE)
 )
-#> Warning in rnorm(1000, theta["mu"], theta["sd"]): NAs produced
-
-#> Warning in rnorm(1000, theta["mu"], theta["sd"]): NAs produced
 
 summary(abc_post_2)
 #>        mu              sd       
-#>  Min.   :2.805   Min.   :1.437  
-#>  1st Qu.:2.923   1st Qu.:1.521  
-#>  Median :2.958   Median :1.545  
-#>  Mean   :2.959   Mean   :1.546  
-#>  3rd Qu.:2.993   3rd Qu.:1.569  
-#>  Max.   :3.121   Max.   :1.666
+#>  Min.   :2.878   Min.   :1.370  
+#>  1st Qu.:3.001   1st Qu.:1.440  
+#>  Median :3.034   Median :1.462  
+#>  Mean   :3.030   Mean   :1.464  
+#>  3rd Qu.:3.063   3rd Qu.:1.488  
+#>  Max.   :3.164   Max.   :1.573
 ```
