@@ -12,7 +12,7 @@ You can install protoABC from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("AnthonyEbert/protoABC", auth_token = "0f7acf8a9c7faa1c678ce5fd8afb195badbca24b")
+devtools::install_github("AnthonyEbert/protoABC")
 ```
 
 Example
@@ -28,7 +28,7 @@ distance_args <- rnorm(1000, 3, 1.5)
 
 summary(distance_args)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  -2.175   2.088   3.011   3.036   4.068   8.109
+#>  -1.947   2.066   3.013   3.007   3.991   7.736
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
@@ -48,12 +48,12 @@ abc_post_1 <- abc_start(
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.864  
-#>  1st Qu.:2.997  
-#>  Median :3.048  
-#>  Mean   :3.046  
-#>  3rd Qu.:3.094  
-#>  Max.   :3.200
+#>  Min.   :2.833  
+#>  1st Qu.:2.963  
+#>  Median :3.016  
+#>  Mean   :3.013  
+#>  3rd Qu.:3.066  
+#>  Max.   :3.159
 ```
 
 ``` r
@@ -85,12 +85,14 @@ abc_post_2 <- abc_start(
   output_control = list(print_output = FALSE)
 )
 
+## Summary
+
 summary(abc_post_2)
 #>        mu              sd       
-#>  Min.   :2.878   Min.   :1.370  
-#>  1st Qu.:3.001   1st Qu.:1.440  
-#>  Median :3.034   Median :1.462  
-#>  Mean   :3.030   Mean   :1.464  
-#>  3rd Qu.:3.063   3rd Qu.:1.488  
-#>  Max.   :3.164   Max.   :1.573
+#>  Min.   :2.870   Min.   :1.391  
+#>  1st Qu.:2.974   1st Qu.:1.468  
+#>  Median :3.007   Median :1.492  
+#>  Mean   :3.004   Mean   :1.493  
+#>  3rd Qu.:3.038   3rd Qu.:1.515  
+#>  Max.   :3.140   Max.   :1.599
 ```

@@ -1,7 +1,13 @@
 Package: protoABC
 Title: Prototyping ABC schemes
-Version: 0.4.1
-Authors@R: c(person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), person("Christopher", "Drovandi", email = "c.drovandi@qut.edu.au", role = c("aut")))
+Version: 0.4.2
+Authors@R: c(
+  person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), 
+  person("Christopher", "Drovandi", role = "aut"),
+  person("Kerrie", "Mengersen", role = "ths"), 
+  person("Fabrizio", "Ruggeri", role = "ths"), 
+  person("Paul", "Wu", role = "ths")
+  )
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4)
 Imports:
@@ -9,7 +15,8 @@ Imports:
   stats, 
   MASS, 
   parallel
-License: What license is it under?
+Copyright: file inst/COPYRIGHTS
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

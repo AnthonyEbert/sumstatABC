@@ -16,10 +16,10 @@ prior_unif <- function(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE){
   if(!is.null(var_names)){stopifnot(length(var_names) == length(lhs_lim))}
 
   if(eval){
-    output <- function(x){
-      stopifnot(length(x) == length(lhs_lim))
+    output <- function(n){
+      stopifnot(length(n) == length(lhs_lim))
 
-      return(ifelse(any(x < lhs_lim) | any(x > rhs_lim), 0, 1))
+      return(ifelse(any(n < lhs_lim) | any(n > rhs_lim), 0, 1))
     }
   } else {
     output <- function(n){

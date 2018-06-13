@@ -86,6 +86,8 @@ abc_post_2 <- abc_start(
   output_control = list(print_output = FALSE)
 )
 
+## Summary
+
 summary(abc_post_2)
 ```
 
