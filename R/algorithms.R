@@ -70,16 +70,24 @@ rejection_core <- function(n, prior, distance, lfunc, distance_args){
 abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, control, output_control, lfunc){
 
   param <- prior(1)
+  distance_test <- distance(as.numeric(param), distance_args)
+
   control$n_param <- dim(param)[2]
   control <- do.call("abc_control.RABC", control)
   output_control <- do.call("abc_output.RABC", output_control)
 
-  dist_col <- dim(param)[2] + 1
-  output <- matrix(ncol = dist_col, nrow = 0)
+  dist_col  <- dim(param)[2] + 1
+  dist_cols <- seq(dist_col, dist_col + length(distance_test) - 1)
+  print(dist_cols)
+  output <- matrix(ncol = dist_col + length(distance_test) - 1, nrow = 0)
 
   trial_run <- rejection_core(control$n, prior, distance, lfunc, distance_args = distance_args)
 
+  print(head(trial_run))
+
   input_params_s <- trial_run[order(trial_run[,dist_col]), ]
+
+  print(head(input_params_s))
 
   dist_next <- input_params_s[control$num_keep, dist_col]
   dist_max <- input_params_s[control$n, dist_col]
@@ -88,7 +96,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
 
   while(dist_max > control$eps_final){
 
-    rw_cov <- control$cov_func(input_params_s[1:control$num_keep, -dist_col])
+    rw_cov <- control$cov_func(input_params_s[1:control$num_keep, -dist_cols])
 
     iacc <- 0
 
@@ -104,12 +112,29 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
       R = R,
       rw_cov = rw_cov,
       distance = distance,
+      dist_cols = dist_cols,
       prior_eval = control$prior_eval
     )
 
+    print(head(output))
+
     output <- t(output)
 
+    #print(names(input_params_s))
+    #names(output)[-dim(output)[2]] <- names(input_params_s)
+
+    print(head(output))
+    print(class(output))
+    print(head(input_params_s))
+    print(class(input_params_s))
+    print("over")
+
+
+
     input_params_s[(control$num_keep + 1):control$n, ] <- output[,-dim(output)[2]]
+
+
+
     iacc <- sum(output[,dim(output)[2]])
 
     p_acc <- iacc / (control$num_drop * R)
@@ -120,6 +145,9 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
     }
 
       # order the particles according to the distance
+    print(dist_col)
+    print(head(input_params_s))
+
     input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
 
     dist_next <- input_params_s[control$num_keep, dist_col]
@@ -144,8 +172,8 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
     output <- as.data.frame(input_params_s)
     names(output) <- c(names(param), "distance")
   } else {
-    output <- as.data.frame(input_params_s[,-dist_col])
-    names(output) <- names(param)
+    output <- as.data.frame(input_params_s)
+    names(output)[1:I(dist_col - 1)] <- names(param)
   }
 
   return(output)
@@ -160,6 +188,7 @@ RABC_core <- function(
   R,
   rw_cov,
   distance,
+  dist_cols,
   prior_eval) {
 
     # resample from the particle population
@@ -169,7 +198,7 @@ RABC_core <- function(
     input_params_s <- as.numeric(input_params_s)
 
     iacc <- 0
-    input_params <- input_params_s[-length(input_params_s)]
+    input_params <- input_params_s[-dist_cols]
     input_s      <- as.numeric(input_params_s[length(input_params_s)])
 
     # attempt to move particle i with MCMC kernel (R iterations)
@@ -178,7 +207,7 @@ RABC_core <- function(
 
       prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(as.numeric(input_params), ncol = 1), rw_cov))
 
-      names(prop) <- param_names[-length(input_params_s)]
+      names(prop) <- param_names[-dist_cols]
       names(input_params) <- names(prop)
 
       #check if its within the prior distribution
@@ -190,7 +219,7 @@ RABC_core <- function(
       dist_prop = distance(prop, distance_args)
 
 
-      if (dist_prop <= dist_next && prior_eval(prop) / prior_eval(input_params) > stats::runif(1)) {
+      if (dist_prop[1] <= dist_next && prior_eval(prop) / prior_eval(input_params) > stats::runif(1)) {
         # Metropolis-Hastings Ratio
         iacc <- iacc + 1
 
@@ -201,7 +230,9 @@ RABC_core <- function(
       }
     }
 
-    return(c(input_params, input_s, sum(iacc)))
+    #print(c(input_params, input_s, sum(iacc)))
+
+    return(as.numeric(c(input_params, input_s, sum(iacc))))
 }
 
 
