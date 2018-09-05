@@ -1,6 +1,6 @@
 Package: protoABC
 Title: Prototyping ABC schemes
-Version: 0.4.4
+Version: 0.4.5
 Authors@R: c(
   person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), 
   person("Christopher", "Drovandi", role = "aut"),
@@ -11,7 +11,6 @@ Authors@R: c(
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4)
 Imports:
-  magrittr, 
   stats, 
   MASS, 
   parallel

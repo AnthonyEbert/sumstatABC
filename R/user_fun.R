@@ -7,7 +7,6 @@
 #' @param rhs_lim vector
 #' @param var_names optional character vector of parameter names
 #' @param eval boolean
-#' @importFrom magrittr %>%
 #' @export
 prior_unif <- function(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE){
 
@@ -25,9 +24,13 @@ prior_unif <- function(lhs_lim, rhs_lim, var_names = NULL, eval = FALSE){
     output <- function(n){
       stopifnot(n %% 1 == 0 && n > 0)
 
-      out <- stats::runif(length(lhs_lim) * n, lhs_lim, rhs_lim) %>%
-        matrix(ncol = length(lhs_lim), byrow = TRUE) %>%
-        as.data.frame()
+      out <-
+        as.data.frame(
+          matrix(
+            stats::runif(length(lhs_lim) * n, lhs_lim, rhs_lim),
+            ncol = length(lhs_lim), byrow = TRUE
+          )
+        )
 
       if(!is.null(var_names)){names(out) <- var_names}
       return(out)
