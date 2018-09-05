@@ -1,9 +1,15 @@
 
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/protoABC)](https://CRAN.R-project.org/package=protoABC) [![Build Status](https://travis-ci.org/AnthonyEbert/protoABC.svg)](https://travis-ci.org/AnthonyEbert/protoABC) [![codecov](https://codecov.io/gh/AnthonyEbert/protoABC/branch/master/graph/badge.svg)](https://codecov.io/gh/AnthonyEbert/protoABC)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 protoABC
 ========
 
-The goal of protoABC is to provide an interface to ABC inference which is as flexible as possible.
+The goal of protoABC is to provide a way to perform ABC (approximate Bayesian computation) inference as flexibly as possible. That is with arbitrarily complex simulation algorithms and distance functions.
+
+The way we implement this is to consider the distance as the output of the simulation and leave the internal details to the user. Parameters in, distance out.
+
+You need to supply a function which returns a positive number (the distance) with up to two arguments, the first is a vector of your parameters of interest, the second is a list of additional inputs to your function.
 
 Installation
 ------------
@@ -18,46 +24,47 @@ devtools::install_github("AnthonyEbert/protoABC")
 Example
 -------
 
-``` r
+The simplest example, a normal distribution. The summary statistic is the sample mean.
 
+``` r
 library(protoABC)
 
-# Infer mean parameter for normal distribution from some observed data
+sample <- rnorm(1000, 3, 1.5)
 
-distance_args <- rnorm(1000, 3, 1.5)
-
-summary(distance_args)
-#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  -1.957   1.967   3.009   3.009   4.029   7.594
+inp <- list(
+  sample_mean = mean(sample), 
+  sample_sd   = sd(sample)
+)
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
-distance <- function(theta, distance_args){
+distance <- function(theta, inp){
   sim <- rnorm(1000, theta)
-  output <- abs(mean(sim) - mean(distance_args))
+  output <- abs(mean(sim) - inp$sample_mean)
   return(output)
 }
 
 abc_post_1 <- abc_start(
   prior,
   distance,
-  distance_args,
+  inp,
   method = "rejection",
   control = list(epsilon = 0.1)
 )
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.859  
-#>  1st Qu.:2.969  
-#>  Median :3.022  
-#>  Mean   :3.021  
-#>  3rd Qu.:3.074  
-#>  Max.   :3.192
+#>  Min.   :2.908  
+#>  1st Qu.:3.023  
+#>  Median :3.078  
+#>  Mean   :3.075  
+#>  3rd Qu.:3.125  
+#>  Max.   :3.231
 ```
 
+The simplest example, a normal distribution. The summary statistics are the sample mean and the standard deviation.
+
 ``` r
-# Infer mean and standard deviation for normal distribution given some observed data
 
 prior <- function(n){
   data.frame(mu = runif(n, 2, 4), sd = rgamma(n, 1, 1))
@@ -70,16 +77,18 @@ prior_eval <- function(theta){
 }
 
 
-distance <- function(theta, distance_args){
+distance <- function(theta, inp){
+  
   sim <- rnorm(1000, theta["mu"], theta["sd"])
-  output <- sqrt( (mean(sim) - mean(distance_args))^2 + (sd(sim) - sd(distance_args))^2)
+  
+  output <- sqrt( (mean(sim) - inp$sample_mean)^2 + (sd(sim) - inp$sample_sd)^2)
   return(output)
 }
 
 abc_post_2 <- abc_start(
   prior,
   distance,
-  distance_args,
+  inp,
   method = "RABC",
   control = list(n = 1000, prior_eval = prior_eval, pacc_final = 0.1), 
   output_control = list(print_output = FALSE)
@@ -89,10 +98,10 @@ abc_post_2 <- abc_start(
 
 summary(abc_post_2)
 #>        mu              sd       
-#>  Min.   :2.871   Min.   :1.374  
-#>  1st Qu.:2.976   1st Qu.:1.449  
-#>  Median :3.009   Median :1.473  
-#>  Mean   :3.008   Mean   :1.473  
-#>  3rd Qu.:3.041   3rd Qu.:1.496  
-#>  Max.   :3.146   Max.   :1.563
+#>  Min.   :2.936   Min.   :1.417  
+#>  1st Qu.:3.029   1st Qu.:1.500  
+#>  Median :3.063   Median :1.523  
+#>  Mean   :3.065   Mean   :1.525  
+#>  3rd Qu.:3.098   3rd Qu.:1.550  
+#>  Max.   :3.219   Max.   :1.619
 ```
