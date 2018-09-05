@@ -28,7 +28,8 @@ abc_RABC_2 <- abc_start(
   inp,
   method = "RABC",
   control = list(n = 20, prior_eval = prior_eval, pacc_final = 0.1),
-  output_control = list(print_output = FALSE, include_dist = TRUE)
+  output_control = list(print_output = FALSE, include_dist = TRUE),
+  cl = "test"
 )
 
 summary(abc_RABC_2)
