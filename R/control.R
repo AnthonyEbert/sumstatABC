@@ -28,7 +28,7 @@ abc_control.RABC <- function(
   pacc_final = 0.02,
   num_drop = n * a,
   num_keep = n - num_drop,
-  n_param,
+  n_param = NA,
   cov_func = ifelse(n_param == 1, stats::var, stats::cov),
   prior_eval = function(x,y){return(1)}){
 

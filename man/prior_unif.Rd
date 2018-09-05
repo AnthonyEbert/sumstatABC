@@ -42,7 +42,7 @@ abc_post <- abc_start(
   distance,
   inp,
   method = "RABC",
-  control = list(n = 20, prior_eval = prior_eval, pacc_final = 0.1),
+  control = list(n = 20, prior_eval = prior_eval, pacc_final = 0.2),
   output_control = list(print_output = FALSE)
 )
 }

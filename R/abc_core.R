@@ -43,7 +43,7 @@
 #'   distance,
 #'   distance_args = inp,
 #'   method = "rejection",
-#'   control = list(epsilon = 0.1, n = 20)
+#'   control = list(epsilon = 0.2, n = 20)
 #' )
 #'
 #' hist(abc_post_1$mean)
@@ -70,7 +70,7 @@
 #'   distance,
 #'   distance_args = inp,
 #'   method = "rejection",
-#'   control = list(epsilon = 0.1, n = 20)
+#'   control = list(epsilon = 0.45, n = 20)
 #' )
 #'
 #' hist(abc_post_2$mean)
@@ -93,7 +93,7 @@
 #'   distance,
 #'   distance_args = inp,
 #'   method = "RABC",
-#'   control = list(prior_eval = prior_eval, n = 20)
+#'   control = list(prior_eval = prior_eval, n = 20, pacc_final = 0.05)
 #' )
 #'
 #' hist(abc_post_3$mean)

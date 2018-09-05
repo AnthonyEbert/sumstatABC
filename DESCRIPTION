@@ -1,5 +1,5 @@
 Package: protoABC
-Title: Prototyping ABC schemes
+Title: Prototyping ABC Schemes
 Version: 0.4.6
 Authors@R: c(
   person("Anthony", "Ebert", email = "anthonyebert+CRAN@gmail.com", role = c("aut", "cre")), 
@@ -8,7 +8,9 @@ Authors@R: c(
   person("Fabrizio", "Ruggeri", role = "ths"), 
   person("Paul", "Wu", role = "ths")
   )
-Description: What the package does (one paragraph).
+Description: An interface for approximate Bayesian computation (ABC)
+    with the aim of giving as much flexibility as possible to the 
+    construction of distance functions. 
 Depends: R (>= 3.4)
 Imports:
   stats, 

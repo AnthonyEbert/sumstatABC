@@ -54,12 +54,12 @@ abc_post_1 <- abc_start(
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.908  
-#>  1st Qu.:3.023  
-#>  Median :3.078  
-#>  Mean   :3.075  
-#>  3rd Qu.:3.125  
-#>  Max.   :3.231
+#>  Min.   :2.865  
+#>  1st Qu.:2.988  
+#>  Median :3.041  
+#>  Mean   :3.037  
+#>  3rd Qu.:3.089  
+#>  Max.   :3.179
 ```
 
 The simplest example, a normal distribution. The summary statistics are the sample mean and the standard deviation.
@@ -98,10 +98,10 @@ abc_post_2 <- abc_start(
 
 summary(abc_post_2)
 #>        mu              sd       
-#>  Min.   :2.936   Min.   :1.417  
-#>  1st Qu.:3.029   1st Qu.:1.500  
-#>  Median :3.063   Median :1.523  
-#>  Mean   :3.065   Mean   :1.525  
-#>  3rd Qu.:3.098   3rd Qu.:1.550  
-#>  Max.   :3.219   Max.   :1.619
+#>  Min.   :2.887   Min.   :1.361  
+#>  1st Qu.:2.993   1st Qu.:1.428  
+#>  Median :3.026   Median :1.449  
+#>  Mean   :3.027   Mean   :1.451  
+#>  3rd Qu.:3.059   3rd Qu.:1.474  
+#>  Max.   :3.156   Max.   :1.582
 ```
