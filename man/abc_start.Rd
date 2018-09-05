@@ -20,7 +20,7 @@ abc_start(prior, distance, distance_args = NULL, method = "rejection",
 
 \item{output_control}{list of options for controlling output of algorithm.}
 
-\item{cl}{an object of class "cluster".}
+\item{cl}{an object of class "cluster" to use \code{parApply} internally or the string "mclapply" to use \code{mclapply} internally.}
 }
 \description{
 Start abc inference

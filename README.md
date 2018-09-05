@@ -28,7 +28,7 @@ distance_args <- rnorm(1000, 3, 1.5)
 
 summary(distance_args)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  -1.947   2.066   3.013   3.007   3.991   7.736
+#>  -1.957   1.967   3.009   3.009   4.029   7.594
 
 prior <- function(n){data.frame(mu = rnorm(n, 5))}
 
@@ -48,12 +48,12 @@ abc_post_1 <- abc_start(
 
 summary(abc_post_1)
 #>        mu       
-#>  Min.   :2.833  
-#>  1st Qu.:2.963  
-#>  Median :3.016  
-#>  Mean   :3.013  
-#>  3rd Qu.:3.066  
-#>  Max.   :3.159
+#>  Min.   :2.859  
+#>  1st Qu.:2.969  
+#>  Median :3.022  
+#>  Mean   :3.021  
+#>  3rd Qu.:3.074  
+#>  Max.   :3.192
 ```
 
 ``` r
@@ -89,10 +89,10 @@ abc_post_2 <- abc_start(
 
 summary(abc_post_2)
 #>        mu              sd       
-#>  Min.   :2.870   Min.   :1.391  
-#>  1st Qu.:2.974   1st Qu.:1.468  
-#>  Median :3.007   Median :1.492  
-#>  Mean   :3.004   Mean   :1.493  
-#>  3rd Qu.:3.038   3rd Qu.:1.515  
-#>  Max.   :3.140   Max.   :1.599
+#>  Min.   :2.871   Min.   :1.374  
+#>  1st Qu.:2.976   1st Qu.:1.449  
+#>  Median :3.009   Median :1.473  
+#>  Mean   :3.008   Mean   :1.473  
+#>  3rd Qu.:3.041   3rd Qu.:1.496  
+#>  Max.   :3.146   Max.   :1.563
 ```

@@ -7,7 +7,7 @@
 #' @param method a character string specifying the algorithm to use.
 #' @param control list of options to use in algorithm.
 #' @param output_control list of options for controlling output of algorithm.
-#' @param cl an object of class "cluster".
+#' @param cl an object of class "cluster" to use \code{parApply} internally or the string "mclapply" to use \code{mclapply} internally.
 #' @details
 #' \code{abc_interface} takes a function for the prior and a function for the distance as arguments. The \code{prior} function must take a single integer \eqn{n} as the argument and return a dataframe with \eqn{n} rows, the number of columns represents the number of parameters in your system. The \code{distance} function must take a numeric vector of length equal to the number of parameters in your system and return a single positive number, the distance.
 #'
@@ -117,7 +117,11 @@ abc_start <- function(prior, distance, distance_args = NULL, method = "rejection
   algorithm <- NA
   class(algorithm) <- method
 
-  parallel <- ifelse(is.null(cl), FALSE, TRUE)
+  parallel <- ifelse(is.null(cl), 1,
+                     ifelse("cluster" %in% class(cl), 2,
+                            ifelse(cl == "mclapply", 3,
+                                   ifelse(cl == "test", 4, 5)))
+  )
 
   lfunc <- make_lfunc(parallel, cl)
 
@@ -130,10 +134,36 @@ abc_start <- function(prior, distance, distance_args = NULL, method = "rejection
 
 
 make_lfunc <- function(parallel, cl){
-  output <- ifelse(!parallel,
+  output <- switch(parallel,
          apply,
          function(X, MARGIN, FUN, ...){
            return(parallel::parApply(cl, X, MARGIN, FUN, ...))
+         },
+         function(X, MARGIN, FUN, ...){
+           Y <- split(t(X), rep(1:ncol(t(X)), each = nrow(t(X))))
+           Y <- lapply(Y, function(i, names_x){
+             names(i) <- names_x
+             return(i)
+            }, names_x = colnames(X))
+
+           output <- parallel::mclapply(Y, FUN, ...)
+           output_mat <- matrix(unlist(output), length(output[[1]]))
+           rownames(output_mat) <- names(output[[1]])
+
+           return(output_mat)
+         },
+         function(X, MARGIN, FUN, ...){
+           Y <- split(t(X), rep(1:ncol(t(X)), each = nrow(t(X))))
+           Y <- lapply(Y, function(i, names_x){
+             names(i) <- names_x
+             return(i)
+           }, names_x = colnames(X))
+
+           output <- lapply(Y, FUN, ...)
+           output_mat <- matrix(unlist(output), length(output[[1]]))
+           rownames(output_mat) <- names(output[[1]])
+
+           return(output_mat)
          }
   )
 
