@@ -15,9 +15,14 @@ abc_algorithm.rejection <- function(prior, distance, distance_args, algorithm, c
 
   n <- control$n
 
+  input_param <- as.numeric(as.matrix(param)); names(input_param) <- names(param);
 
+  test_run <- distance(input_param, distance_args)
+
+
+  all_col <- dim(param)[2] + length(test_run)
   dist_col <- dim(param)[2] + 1
-  output <- matrix(ncol = dist_col, nrow = 0)
+  output <- matrix(ncol = all_col, nrow = 0)
 
   while(dim(output)[1] < control$n){
 
@@ -38,9 +43,10 @@ abc_algorithm.rejection <- function(prior, distance, distance_args, algorithm, c
   output <- output[sample.int(control$n), ]
   rownames(output) <- seq(length=nrow(output))
 
-  names(output) <- c(names(param), "distance")
+  names(output) <- c(names(param), names(test_run))
 
   if(output_control$include_dist){
+    names(output)[dist_col] <- "distance"
     return(output)
   } else {
     return(output[, - dist_col, drop = FALSE])
@@ -74,12 +80,19 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
   control <- do.call("abc_control.RABC", control)
   output_control <- do.call("abc_output.RABC", output_control)
 
+  input_param <- as.numeric(as.matrix(param)); names(input_param) <- names(param);
+
+  test_run <- distance(input_param, distance_args)
+
+  all_col <- dim(param)[2] + length(test_run)
   dist_col <- dim(param)[2] + 1
-  output <- matrix(ncol = dist_col, nrow = 0)
+  output <- matrix(ncol = all_col, nrow = 0)
 
   trial_run <- rejection_core(control$n, prior, distance, lfunc, distance_args = distance_args)
 
   input_params_s <- trial_run[order(trial_run[,dist_col]), ]
+
+  print(input_params_s)
 
   dist_next <- input_params_s[control$num_keep, dist_col]
   dist_max <- input_params_s[control$n, dist_col]
@@ -88,7 +101,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
 
   while(dist_max > control$eps_final){
 
-    rw_cov <- control$cov_func(input_params_s[1:control$num_keep, -dist_col])
+    rw_cov <- control$cov_func(input_params_s[1:control$num_keep, 1:dim(param)[2]])
 
     iacc <- 0
 
@@ -109,8 +122,10 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
 
     output <- t(output)
 
+    print(head(output))
+
     input_params_s[(control$num_keep + 1):control$n, ] <- output[,-dim(output)[2]]
-    iacc <- sum(output[,dim(output)[2]])
+    iacc <- sum(output[,dist_col])
 
     p_acc <- iacc / (control$num_drop * R)
     R = floor(log(control$c1) / log(1 - p_acc) + 1)
@@ -140,12 +155,13 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
 
   }
 
+  names(output) <- c(names(param), names(test_run))
+
   if(output_control$include_dist){
     output <- as.data.frame(input_params_s)
-    names(output) <- c(names(param), "distance")
+    names(output)[dist_col] <- "distance"
   } else {
     output <- as.data.frame(input_params_s[,-dist_col])
-    names(output) <- names(param)
   }
 
   return(output)
@@ -162,6 +178,8 @@ RABC_core <- function(
   distance,
   prior_eval) {
 
+    num_params <- dim(rw_cov)[1]
+
     # resample from the particle population
     param_names <- names(input_params_s)
 
@@ -169,8 +187,8 @@ RABC_core <- function(
     input_params_s <- as.numeric(input_params_s)
 
     iacc <- 0
-    input_params <- input_params_s[-length(input_params_s)]
-    input_s      <- as.numeric(input_params_s[length(input_params_s)])
+    input_params <- input_params_s[1:num_params]
+    input_s      <- as.numeric(input_params_s[num_params + 1])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
@@ -178,7 +196,7 @@ RABC_core <- function(
 
       prop <- as.numeric(MASS::mvrnorm(n = 1, as.matrix(as.numeric(input_params), ncol = 1), rw_cov))
 
-      names(prop) <- param_names[-length(input_params_s)]
+      names(prop) <- param_names[1:num_params]
       names(input_params) <- names(prop)
 
       #check if its within the prior distribution
