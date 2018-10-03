@@ -130,7 +130,9 @@ abc_start <- function(prior, distance, distance_args = NULL, method = "rejection
 
   lfunc <- make_lfunc(parallel, cl)
 
-  distance <- ifelse(is.null(distance_args), function(i, distance_args){distance(i)}, distance)
+  if(is.null(distance_args)){
+    distance <- function(i, distance_args){distance(i)}
+  }
 
   output <- abc_algorithm(prior, distance, distance_args, algorithm, control, output_control, lfunc)
 
