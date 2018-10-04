@@ -1,4 +1,4 @@
-Package: protoABC
+Package: sumstatABC
 Title: Prototyping ABC Schemes
 Version: 0.4.6.9
 Authors@R: c(
