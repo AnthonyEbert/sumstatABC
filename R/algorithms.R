@@ -119,6 +119,10 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
       break;
     }
 
+    if ((dist_max - dist_next)/dist_max < control$d_eps_final){
+      break;
+    }
+
       # order the particles according to the distance
     input_params_s <- input_params_s[order(input_params_s[,dist_col]), ]
 
