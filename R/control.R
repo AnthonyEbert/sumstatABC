@@ -26,6 +26,7 @@ abc_control.RABC <- function(
   R = 10,
   eps_final = 0,
   pacc_final = 0.02,
+  d_eps_final = Inf,
   num_drop = n * a,
   num_keep = n - num_drop,
   n_param = NA,
