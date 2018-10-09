@@ -199,7 +199,7 @@ RABC_core <- function(
 
     iacc <- 0
     input_params <- input_params_s[1:num_params]
-    input_s      <- as.numeric(input_params_s[num_params + 1])
+    input_s      <- as.numeric(input_params_s[-c(1:num_params)])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
@@ -225,12 +225,12 @@ RABC_core <- function(
 
         input_params <- prop
 
-        input_s <- as.numeric(dist_prop[1])
+        input_s <- dist_prop
 
       }
     }
 
-    output <- c(input_params, dist_prop, sum(iacc))
+    output <- c(input_params, input_s, sum(iacc))
 
     #stopifnot(length(output) == length(input_params) + 3 + 1)
 
