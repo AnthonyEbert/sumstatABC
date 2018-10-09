@@ -12,7 +12,7 @@ abc_control.rejection <- function(
 }
 
 abc_output.rejection <- function(
-  include_dist = FALSE){
+  include_dist = TRUE){
 
   return(as.list(environment(), all=TRUE))
 }
@@ -36,7 +36,7 @@ abc_control.RABC <- function(
 }
 
 abc_output.RABC <- function(
-  include_dist = FALSE,
+  include_dist = TRUE,
   print_output = TRUE){
 
   return(as.list(environment(), all=TRUE))
