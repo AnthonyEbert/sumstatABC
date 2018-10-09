@@ -86,6 +86,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
 
   all_col <- dim(param)[2] + length(test_run)
   dist_col <- dim(param)[2] + 1
+
   output <- matrix(ncol = all_col, nrow = 0)
 
   trial_run <- rejection_core(control$n, prior, distance, lfunc, distance_args = distance_args)
@@ -129,7 +130,7 @@ abc_algorithm.RABC <- function(prior, distance, distance_args, algorithm, contro
     # print(input_params_s)
 
     input_params_s[(control$num_keep + 1):control$n, ] <- output[,-dim(output)[2]]
-    iacc <- sum(output[,dist_col])
+    iacc <- sum(output[,dim(output)[2]])
 
     p_acc <- iacc / (control$num_drop * R)
     R = floor(log(control$c1) / log(1 - p_acc) + 1)
@@ -187,6 +188,7 @@ RABC_core <- function(
   prior_eval) {
 
     num_params <- dim(rw_cov)[1]
+
     if(is.null(num_params)){num_params <- 1}
 
     # resample from the particle population
@@ -197,7 +199,7 @@ RABC_core <- function(
 
     iacc <- 0
     input_params <- input_params_s[1:num_params]
-    input_s      <- as.numeric(input_params_s[-c(1:num_params)])
+    input_s      <- as.numeric(input_params_s[num_params + 1])
 
     # attempt to move particle i with MCMC kernel (R iterations)
     for (j in 1:R) {
@@ -214,7 +216,7 @@ RABC_core <- function(
         next
       }
 
-      dist_prop = distance(prop, distance_args)
+      dist_prop = as.numeric(distance(prop, distance_args))
 
 
       if (dist_prop[1] <= dist_next && prior_eval(prop) / prior_eval(input_params) > stats::runif(1)) {
@@ -223,17 +225,14 @@ RABC_core <- function(
 
         input_params <- prop
 
-        input_s <- dist_prop
+        input_s <- as.numeric(dist_prop[1])
 
       }
     }
 
-    output <- c(input_params, input_s, sum(iacc))
+    output <- c(input_params, dist_prop, sum(iacc))
 
-    print(output)
-    print(rw_cov)
-
-    stopifnot(length(output) == length(input_params) + 3 + 1)
+    #stopifnot(length(output) == length(input_params) + 3 + 1)
 
     return(output)
 }
